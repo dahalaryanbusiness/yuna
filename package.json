@@ -1,0 +1,21 @@
+{
+  "name": "yuna",
+  "version": "4.1.0",
+  "description": "Yuna - a public Discord love + economy bot (relationships, economy, businesses, games, pets and more)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy": "node src/deploy-commands.js",
+    "test": "node tools/smoke.js",
+    "test:all": "node tools/smoke.js --all",
+    "emojis": "python3 tools/make_mega_emojis.py",
+    "emojis:unique": "python3 tools/make_unique_emojis.py"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5"
+  }
+}

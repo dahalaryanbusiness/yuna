@@ -1,0 +1,86 @@
+// Careers: 8 ranks per job, 5 education levels, 36 jobs. Pay is per shift at rank 1.0x.
+const RANKS = [
+  { n: 'Intern', xp: 0, m: 0.6 }, { n: 'Junior', xp: 120, m: 1 }, { n: 'Associate', xp: 350, m: 1.35 }, { n: 'Senior', xp: 800, m: 1.8 },
+  { n: 'Lead', xp: 1600, m: 2.4 }, { n: 'Manager', xp: 3200, m: 3.2 }, { n: 'Director', xp: 6500, m: 4.5 }, { n: 'Executive', xp: 13000, m: 6.5 },
+];
+const EDU = [
+  { n: 'No degree', sessions: 0, cost: 0 }, { n: 'High school diploma', sessions: 3, cost: 60 }, { n: "Bachelor's degree", sessions: 6, cost: 250 },
+  { n: "Master's degree", sessions: 10, cost: 800 }, { n: 'PhD', sessions: 15, cost: 2500 },
+];
+// field: used for rank-keeping when you switch jobs inside the same field. police = unlocks /crime arrest + patrol.
+const J = (id, name, field, icon, edu, min, max, cd, extra = {}) => ({ id, name, field, icon, edu, pay: [min, max], cd, ...extra });
+const JOBS = [
+  J('cashier', 'Cashier', 'retail', 'coins_gold', 0, 14, 30, 20),
+  J('rider', 'Delivery Rider', 'service', 'parcel_brown', 0, 16, 34, 20),
+  J('barista', 'Barista', 'food', 'cocktail_orange_pink', 0, 15, 32, 20),
+  J('waiter', 'Waiter', 'food', 'flute_white', 0, 15, 36, 20),
+  J('cleaner', 'Cleaner', 'service', 'a_twinkle_white', 0, 14, 28, 15),
+  J('dogwalker', 'Dog Walker', 'service', 'an_dog_golden', 0, 14, 30, 15),
+  J('busker', 'Street Performer', 'arts', 'misc_notes', 0, 8, 60, 25, { note: 'High risk, high reward.' }),
+  J('mechanic', 'Mechanic', 'trade', 'misc_hammer', 1, 28, 60, 25),
+  J('chef', 'Chef', 'food', 'chili_red', 1, 30, 65, 25),
+  J('cop', 'Police Officer', 'police', 'bm_siren_blue', 1, 32, 66, 25, { police: true, note: 'Unlocks /crime patrol and /crime arrest.' }),
+  J('firefighter', 'Firefighter', 'rescue', 'a_fire_orange', 1, 30, 64, 25),
+  J('farmer', 'Farmer', 'trade', 'flower_lime', 1, 26, 58, 25),
+  J('hairdresser', 'Hairdresser', 'service', 'lipstick', 1, 26, 56, 20),
+  J('taxi', 'Taxi Driver', 'service', 'ticket_yellow', 1, 25, 62, 20),
+  J('streamer', 'Streamer', 'arts', 'a_face_cool', 1, 5, 120, 30, { note: 'Wild income swings.' }),
+  J('teacher', 'Teacher', 'education', 'letter', 2, 55, 110, 30),
+  J('nurse', 'Nurse', 'medical', 'potion_pink', 2, 58, 115, 30),
+  J('coder', 'Programmer', 'tech', 'misc_robot', 2, 70, 135, 30),
+  J('designer', 'Designer', 'arts', 'a_twinkle_pink', 2, 60, 120, 30),
+  J('accountant', 'Accountant', 'finance', 'bill_green', 2, 62, 118, 30),
+  J('detective', 'Detective', 'police', 'bm_spy_eye', 2, 65, 125, 30, { police: true, note: 'Police powers and better arrest odds.' }),
+  J('pilot', 'Pilot', 'transport', 'misc_rocket', 2, 75, 140, 35),
+  J('journalist', 'Journalist', 'media', 'bm_ledger', 2, 58, 116, 30),
+  J('photographer', 'Photographer', 'arts', 'shades_black', 2, 55, 112, 30),
+  J('engineer', 'Engineer', 'tech', 'a_gem_cyan', 3, 110, 200, 35),
+  J('lawyer', 'Lawyer', 'law', 'bm_scales', 3, 120, 220, 35, { note: 'Halves your jail time.' }),
+  J('doctor', 'Doctor', 'medical', 'a_potion_pink', 3, 130, 230, 40),
+  J('banker', 'Banker', 'finance', 'goldbar_gold', 3, 125, 225, 35, { note: 'Bank interest +50%.' }),
+  J('manager', 'Business Manager', 'finance', 'briefcase_black', 3, 115, 210, 35, { note: 'Business income +10%.' }),
+  J('architect', 'Architect', 'trade', 'crate_navy', 3, 110, 205, 35),
+  J('scientist', 'Scientist', 'tech', 'potion_cyan', 4, 190, 330, 40),
+  J('surgeon', 'Surgeon', 'medical', 'a_potion_pink', 4, 220, 380, 45),
+  J('judge', 'Judge', 'law', 'a_crown_white', 4, 210, 360, 45),
+  J('ceo', 'CEO', 'finance', 'a_crown_gold', 4, 240, 420, 50, { note: 'Rewards +5% per rank.' }),
+  J('astronaut', 'Astronaut', 'transport', 'a_twinkle_gold', 4, 230, 400, 50),
+  J('president', 'Mayor', 'law', 'a_crown_purple', 4, 200, 350, 45),
+];
+const LINES = {
+  retail: ['scanned a mountain of groceries', 'fixed a jammed till', 'restocked the shelves'],
+  service: ['finished every stop on your route', 'kept a client very happy', 'got a great review'],
+  food: ['survived the lunch rush', 'plated a perfect order', 'got praised by a regular'],
+  arts: ['made something people loved', 'finished a client project', 'went viral for a few minutes'],
+  trade: ['fixed the impossible thing', 'finished the job ahead of schedule', 'earned a very happy customer'],
+  police: ['kept the streets quiet', 'wrote a stack of reports', 'helped a lost kid find their parents'],
+  rescue: ['saved a cat from a tree', 'ran a safety drill', 'pulled off a clean rescue'],
+  education: ['graded a pile of essays', 'ran a brilliant lesson', 'helped a struggling student'],
+  medical: ['finished rounds early', 'comforted a nervous patient', 'handled a busy ward'],
+  tech: ['shipped a clean release', 'squashed a nasty bug', 'got the demo working live'],
+  finance: ['balanced the books', 'closed a big deal', 'spotted a costly mistake'],
+  transport: ['landed a smooth trip', 'beat the weather', 'brought everyone home safe'],
+  media: ['broke a story', 'nailed an interview', 'filed before the deadline'],
+  law: ['won a tricky motion', 'drafted a perfect contract', 'kept the court on schedule'],
+};
+const BUSINESSES = [
+  { id: 'lemonade', name: 'Lemonade Stand', icon: 'potion_yellow', price: 500, hourly: 4 },
+  { id: 'cafe', name: 'Cozy Cafe', icon: 'cocktail_orange_pink', price: 4000, hourly: 27 },
+  { id: 'bookshop', name: 'Bookshop', icon: 'letter', price: 12000, hourly: 70 },
+  { id: 'arcade', name: 'Arcade', icon: 'a_chip_gold', price: 35000, hourly: 184 },
+  { id: 'restaurant', name: 'Restaurant', icon: 'chili_red', price: 100000, hourly: 476 },
+  { id: 'studio', name: 'Movie Studio', icon: 'ticket_gold', price: 350000, hourly: 1522 },
+  { id: 'hotel', name: 'Grand Hotel', icon: 'a_crown_gold', price: 1200000, hourly: 4800 },
+  { id: 'casino', name: 'Yuna Casino', icon: 'a_slot_jackpot', price: 5000000, hourly: 18500 },
+];
+const STOCKS = [
+  { s: 'YUNA', n: 'Yuna Corp', p: 120, v: 0.02, icon: 'heart_pulse' },
+  { s: 'LOVE', n: 'LoveTech', p: 85, v: 0.03, icon: 'heart_red' },
+  { s: 'ROSE', n: 'Rose Gardens', p: 40, v: 0.025, icon: 'rose_red' },
+  { s: 'GEMS', n: 'Gem Traders', p: 260, v: 0.035, icon: 'gem_pink' },
+  { s: 'CAFE', n: 'Cafe Chain', p: 55, v: 0.02, icon: 'cocktail_orange_pink' },
+  { s: 'BANK', n: 'Yuna Bank', p: 180, v: 0.015, icon: 'bank' },
+  { s: 'MOON', n: 'MoonCoin (crypto)', p: 30, v: 0.08, icon: 'a_crypto_orange' },
+  { s: 'BTLY', n: 'Bitly Crypto', p: 500, v: 0.06, icon: 'crypto_gold' },
+];
+module.exports = { RANKS, EDU, JOBS, LINES, BUSINESSES, STOCKS };

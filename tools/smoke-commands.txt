@@ -1,0 +1,74 @@
+# one command per line; @YOU is a second user. Add your own lines freely.
+help
+help bank
+balance
+cash
+wallet
+bank balance
+bank deposit all
+bank withdraw 400k
+bank withdraw 1000
+bank interest
+daily
+weekly
+monthly
+work
+job list
+office coffee
+business list
+@lp 900000
+business buy cafe
+business buy lemonade
+business info
+@age
+business restock
+business collect
+business collect
+business upgrade cafe
+business hire cafe
+business advertise
+business top
+invest market
+invest buy BTC 1
+invest portfolio
+invest chart BTC
+give @YOU 100
+rob @YOU
+casino coinflip 100 heads
+casino slots 100
+casino dice 100
+lottery enter
+lottery
+shop
+buy rose
+inventory
+leaderboard
+level
+quest view
+rewards list
+pet adopt cat
+explore tidepool
+crime status
+profile
+hug @YOU
+kiss @YOU
+prefix
+privacy
+sky
+aura
+mood forecast
+help love
+help bank deposit
+help cf
+help nonsense
+settings view
+quest claim
+level rewards
+rewards quarterly
+lovemeter Anna | Ben
+ship @YOU
+date @YOU
+relationship
+shop
+gift rose @YOU
+work
