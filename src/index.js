@@ -24,6 +24,7 @@ const lottery = require('./commands/lottery');
 const levels = require('./lib/levels');
 const channels = require('./lib/channels');
 const signature = require('./commands/signature');
+const register = require('./lib/register');
 
 if (!process.env.DISCORD_TOKEN) {
   console.error('Missing DISCORD_TOKEN in .env');
@@ -81,6 +82,11 @@ function createClient(withMessageContent) {
     const st = store.info();
     console.log(`[store] ${st.users} user(s) loaded from ${st.loadedFrom} | folder ${st.dir} | persistent: ${st.persistent ? 'yes' : 'NO - add a Railway Volume!'}`);
     applyPresence();
+    if (process.env.REGISTER_COMMANDS !== 'off') {
+      register.sync(client)
+        .then((r) => console.log(`[commands] ${r.count} slash commands ${r.changed ? 'registered with Discord' : 'already up to date'}`))
+        .catch((err) => console.error('[commands] could not register slash commands:', err.message));
+    }
     emojis.sync(client).then((r) => console.log(`[emoji] ${r.have} found, ${r.uploaded} uploaded, ${r.failed} failed`)).catch(() => {});
     const gifTypes = [];
     for (const c of client.commands.values()) {

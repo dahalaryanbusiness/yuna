@@ -1,6 +1,7 @@
 # one command per line; @YOU is a second user. Add your own lines freely.
 help
 help bank
+yuna
 balance
 cash
 wallet
