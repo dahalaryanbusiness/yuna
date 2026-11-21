@@ -4,12 +4,12 @@ A public Discord **love + economy bot**: affection gifs, dating, marriage, an ec
 pets, games, family trees and more. Every reply is a clean embed, every command works as a slash command **and** as text
 (`yuna daily`), and the look, prefix, colors, help and numbers are all configurable.
 
-**Quick links:** [Customizing](docs/CUSTOMIZING.md) · [What changed in 4.1](CHANGES.md) · [Economy balance](BALANCE.md) · in Discord: `/help`
+**Quick links:** [Customizing](docs/CUSTOMIZING.md) · [Economy balance](BALANCE.md) · in Discord: `/help`
 
 ## Quick start
 1. Node.js 18+, then `npm install`
-2. Copy `.env.example` to `.env` and fill `DISCORD_TOKEN` and `CLIENT_ID`
-3. `npm run deploy` (registers slash commands, run again after updates), then `npm start`
+2. Copy `.env.example` to `.env` and fill `DISCORD_TOKEN`
+3. `npm start` (slash commands are registered with Discord automatically whenever they change)
 4. Tweak `config/yuna.config.js` (look, prefix, switches) and `src/data/balance.js` (economy numbers), restart
 5. `npm test` checks everything without a token
 
@@ -43,14 +43,13 @@ Other changes: `/explore` is now tide pools / moonlit meadow / forgotten ruins (
 
 ### New emojis
 `python3 tools/make_unique_emojis.py` draws the 75 signature emojis (Garden, Sky incl. 8 moon phases, Vault, Whisper, Aura, Mood, Ritual, Duet, Trust) into `assets/emojis`.
-They upload automatically at startup like the others (1,875 of the 2,000 application-emoji slots are used). **Run `npm run deploy` again** after updating.
+They upload automatically at startup like the others (1,875 of the 2,000 application-emoji slots are used).
 
 ## Setup
 1. Install Node.js 18+.
 2. `npm install`
-3. Create a `.env` file in this folder with `DISCORD_TOKEN=...` and `CLIENT_ID=...`.
-4. `npm run deploy`  (registers slash commands globally - run again after every update)
-5. `npm start`
+3. Create a `.env` file in this folder with `DISCORD_TOKEN=...`.
+4. `npm start` (registers the slash commands by itself; `npm run deploy` forces it and needs `CLIENT_ID` too)
 
 Optional `.env` values: `BOT_STATUS` (`dnd` default, `online`, `idle`, `invisible`) and `DATA_DIR`
 (where `love.json` is saved, default `./data`). **Back up the data folder** - it holds everyone's relationships.
@@ -192,7 +191,6 @@ Discord allows **100** global slash commands and Yuna was at 99. To make room, r
 (`src/loadCommands.js`, `FOLDS`): `/love` (flirt, compliment, poem, lovequote, loveletter, dedicate, valentine), `/game` (wouldyourather,
 truthordare, lovetrivia), `/family` (view, adopt, disown), `/me` (setbio, gender, looking, lovenote, inbox).
 Their old text commands still work (`yuna flirt @user`). The bot now registers **94** commands, so 6 slots are free.
-Run `npm run deploy` again after updating so Discord removes the old commands.
 
 ### Tuning
 Pay, cooldowns, prices and odds are plain numbers at the top of `src/data/careers.js` (jobs, ranks, education, businesses, stocks),
@@ -203,4 +201,3 @@ Pay, cooldowns, prices and odds are plain numbers at the top of `src/data/career
 - **/quest** (view, claim): 3 daily + 2 weekly quests that fill up automatically, daily sweep bonus and streaks.
 - **/business** now has `hire` (managers), `advertise`, `top`, and random events when you collect.
 - **/game rps**, **/game riddle**, **/love fortune** (also `yuna rps rock`, `yuna riddle`, `yuna fortune`).
-- Run `npm run deploy` once after updating so Discord learns the new commands (exactly 100 of 100 global slots are used now; new features go into existing groups).
