@@ -65,7 +65,7 @@ function plotEmoji(p) {
   if (p.w === 2) return e(`gd_bud_${p.f}`);
   return p.w === 1 ? e('gd_sprout') : e('gd_seed');
 }
-function gardenCard(user, viewerIsOwner) {
+function gardenCard(user) {
   const g = garden(user.id);
   const now = Date.now();
   const lines = g.plots.map((p, i) => {
@@ -81,8 +81,7 @@ function gardenCard(user, viewerIsOwner) {
   const stash = Object.entries(g.stash).filter(([, n]) => n > 0).map(([f, n]) => `${e(`gd_bloom_${f}`)} ${FLOWERS[f].name} ×${n}`).join('  ') || '*nothing yet*';
   return embed(0x8bd88b)
     .setTitle(`${e('gd_pot')} ${user.displayName || user.username}'s garden`)
-    .setDescription(`${lines.join('\n')}\n\n${e('gd_bouquet')} **Harvested blooms:** ${stash}`)
-    .setFooter({ text: viewerIsOwner ? 'Plant with /garden plant, water with /garden water. Friends can water your plants too!' : 'You can water this garden with /garden water @them' });
+    .setDescription(`${lines.join('\n')}\n\n${e('gd_bouquet')} **Harvested blooms:** ${stash}`);
 }
 
 const garden_cmd = {
@@ -108,7 +107,7 @@ const garden_cmd = {
     if (sub === 'view') {
       const t = i.options.getUser('user') || i.user;
       if (t.id !== id && !(await guardTarget(i, t, { allowSelf: true }))) return;
-      return i.reply({ embeds: [gardenCard(t, t.id === id)] });
+      return i.reply({ embeds: [gardenCard(t)] });
     }
 
     if (sub === 'plant') {
@@ -237,8 +236,7 @@ function skyCard(user, sky, shared, partnerUser) {
   const names = (sky.stars || []).slice(-12).map((s) => `${e(STAR_COLORS[s.c] || 'sk_star_gold')} ${s.n}`).join('  ·  ') || '*no stars yet, place one with `/sky star`*';
   const em = embed(0x2b2d6e)
     .setTitle(`${e('sk_constellation')} ${title}`)
-    .setDescription(`${renderSky(sky, shared ? `c${[user.id, partnerUser && partnerUser.id].sort().join('')}` : user.id)}\n\n${names}`)
-    .setFooter({ text: `${(sky.stars || []).length} star${(sky.stars || []).length === 1 ? '' : 's'} · tonight: ${MOON[phase]}${shared ? ' · shared by two' : ''}` });
+    .setDescription(`${renderSky(sky, shared ? `c${[user.id, partnerUser && partnerUser.id].sort().join('')}` : user.id)}\n\n${names}\n\n${(sky.stars || []).length} star${(sky.stars || []).length === 1 ? '' : 's'} · tonight: ${MOON[phase]}${shared ? ' · shared by two' : ''}`);
   if (!shared && sky.wishes && sky.wishes.length) em.addFields({ name: `${e('a_sk_wish')} Last wish`, value: `*${sky.wishes[sky.wishes.length - 1].t}*` });
   return em;
 }
@@ -362,7 +360,7 @@ const timelock_cmd = {
 
     if (sub === 'view') {
       if (!vs.length) return i.reply({ content: `${e('vt_vault')} You have no locked vaults. Start one with \`/timelock lock\`.`, flags: EPH });
-      return i.reply({ embeds: [embed(0xb8c0d8).setTitle(`${e('vt_vault')} ${i.user.displayName}'s time vaults`).setDescription(vs.map(vaultLine).join('\n')).setFooter({ text: `${num(vs.reduce((a, v) => a + v.amount, 0))} LP locked in total` })] });
+      return i.reply({ embeds: [embed(0xb8c0d8).setTitle(`${e('vt_vault')} ${i.user.displayName}'s time vaults`).setDescription(`${vs.map(vaultLine).join('\n')}\n\n**${num(vs.reduce((a, v) => a + v.amount, 0))} LP** locked in total`)] });
     }
 
     if (sub === 'lock') {
@@ -585,7 +583,7 @@ const duet_cmd = {
       d.lines.push({ by: id, text }); d.turn = id === d.a ? d.b : d.a; d.last = Date.now(); store.save();
       if (d.lines.length >= 12) {
         const text2 = storyText(d); await finishDuet(i, key, d);
-        return i.reply({ embeds: [embed(0xff8fab).setTitle(`${e('du_pages')} A finished story by two`).setDescription(text2).setFooter({ text: 'Both authors got a reward and the story is on both shelves.' })] });
+        return i.reply({ embeds: [embed(0xff8fab).setTitle(`${e('du_pages')} A finished story by two`).setDescription(text2)] });
       }
       const tail = d.lines.slice(-3).map((l) => `<@${l.by}>: ${l.text}`).join('\n');
       return i.reply({ content: `${e('du_pen')} **Line ${d.lines.length}** added. <@${d.turn}>, your turn!\n${tail}\n-# ${d.lines.length >= 4 ? 'Either of you can end it with /duet finish. ' : ''}Max 12 lines.`, allowedMentions: { users: [d.turn] } });
@@ -597,7 +595,7 @@ const duet_cmd = {
       const { key, d } = cur;
       if (d.lines.length < 4) return i.reply({ content: `${e('cross')} A story needs at least **4 lines** (you have ${d.lines.length}).`, flags: EPH });
       const text = storyText(d); await finishDuet(i, key, d);
-      return i.reply({ embeds: [embed(0xff8fab).setTitle(`${e('du_pages')} A finished story by two`).setDescription(`${text}\n\n-# <@${d.a}> & <@${d.b}>`).setFooter({ text: 'Both authors got a reward and the story is on both shelves.' })], allowedMentions: { parse: [] } });
+      return i.reply({ embeds: [embed(0xff8fab).setTitle(`${e('du_pages')} A finished story by two`).setDescription(`${text}\n\n-# <@${d.a}> & <@${d.b}>`)], allowedMentions: { parse: [] } });
     }
 
     const shelf = sig(id).duets || [];
@@ -663,7 +661,7 @@ const aura_cmd = {
           if (s.aura.streak % 7 === 0) { E.addGems(id, 1); em.addFields({ name: `${e('gem_pink')} Aura streak reward`, value: `**${s.aura.streak} days** in a row! +1 gem` }); }
           store.save();
         }
-        em.setFooter({ text: `Aura streak: ${s.aura.streak} day${s.aura.streak === 1 ? '' : 's'} (best ${s.aura.best}). Come back tomorrow, your aura changes every day.` });
+        em.addFields({ name: `${e('fire')} Aura streak`, value: `**${s.aura.streak}** day${s.aura.streak === 1 ? '' : 's'} (best ${s.aura.best})`, inline: true });
       }
       return i.reply({ embeds: [em] });
     }
@@ -679,7 +677,7 @@ const aura_cmd = {
       if (hasPair(CLASH, a, b)) { score -= 15; note = 'Opposite energies, which can be exciting or exhausting. Be patient.'; }
       score = Math.max(5, Math.min(100, score));
       return i.reply({ embeds: [embed(0xff82be).setTitle(`${e(AURAS[a].emoji)} ${AURAS[a].name}  ×  ${AURAS[b].name} ${e(AURAS[b].emoji)}`)
-        .setDescription(`**${i.user.displayName}** and **${t.displayName || t.username}**\n${bar(score, 100)} **${score}%**\n${note}`).setFooter({ text: 'Auras change every day (UTC), so try again tomorrow.' })] });
+        .setDescription(`**${i.user.displayName}** and **${t.displayName || t.username}**\n${bar(score, 100)} **${score}%**\n${note}`)] });
     }
   },
 };
@@ -733,7 +731,7 @@ const mood_cmd = {
       const top = Object.entries(count).sort((a, b) => b[1] - a[1])[0][0];
       const headline = { sunny: 'Clear skies and good vibes over the server.', cloudy: 'A grey-ish day, be extra kind to each other.', stormy: 'Storm warning! Check on your friends today.', rainbow: 'Rainbows everywhere, people are bouncing back.', foggy: 'Low visibility, many people feel unsure. Slow down.', snowy: 'A cozy, quiet day across the server.' }[top];
       const rows = Object.keys(WEATHER).filter((k) => count[k]).map((k) => `${e(`mo_${k}`)} **${WEATHER[k].label}** ${bar(count[k], live.length)} ${count[k]}`).join('\n');
-      return i.reply({ embeds: [embed(0x7fb5ff).setTitle(`${e(`mo_${top}`)} ${i.guild ? i.guild.name : 'Server'} forecast`).setDescription(`**${headline}**\n\n${rows}`).setFooter({ text: `${live.length} reports in the last 24 hours` })] });
+      return i.reply({ embeds: [embed(0x7fb5ff).setTitle(`${e(`mo_${top}`)} ${i.guild ? i.guild.name : 'Server'} forecast`).setDescription(`**${headline}**\n\n${rows}\n\n${live.length} reports in the last 24 hours`)] });
     }
   },
 };

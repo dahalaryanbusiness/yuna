@@ -7,7 +7,7 @@ added/removed commands or changed a slash-command description.
 
 | Section | What it controls |
 |---|---|
-| `brand` | Bot name, footer text, show/hide footer, timestamps on embeds |
+| `brand` | Bot name and timestamps on embeds |
 | `colors` | Every embed color (pink, gold, green...) plus `success` / `error` / `warning` / `info` |
 | `ui.style` | `'embed'` (default, **every** reply is an embed) or `'mixed'` (a few commands as plain text, see `ui.plainCommands`) |
 | `ui.autoEmbed` | Wraps leftover plain text (errors, one-liners) in a styled embed |
@@ -34,7 +34,7 @@ prefix: { aliases: { pay: 'give', b: 'balance' } }   // "yuna pay @user 50"
 ```
 
 ## 2. `/settings` (per server, needs Manage Server)
-`/settings color #ff5c8a` accent color of Yuna's standard embeds, `/settings footer <text|off>`, `/settings view`, `/settings reset`.
+`/settings color #ff5c8a` accent color of Yuna's standard embeds, `/settings view`, `/settings reset`.
 Status colors (green = success, red = error) are never changed.
 
 ## 3. Economy numbers: `src/data/balance.js`

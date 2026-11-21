@@ -67,7 +67,6 @@ const daily = {
         { name: `${emo('fire')} Streak`, value: `${'▰'.repeat(flame)}${'▱'.repeat(7 - flame)}  day **${u.streak}**${flame === 7 ? ' (full week!)' : ''}`, inline: true },
         { name: `${emo('clock')} Next letter`, value: `<t:${Math.floor((now + DAILY_MS) / 1000)}:R>`, inline: true }
       );
-    letter.setFooter({ text: flame === 7 ? 'Full week! Keep the streak alive tomorrow.' : 'Come back tomorrow to keep your streak.' });
     return interaction.reply({ content: header, embeds: [letter] });
   },
 };

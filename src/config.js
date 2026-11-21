@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const DEFAULTS = {
-  brand: { name: 'Yuna', footer: 'Yuna  \u2022  /help', showFooter: true, showTimestamp: false },
+  brand: { name: 'Yuna', showTimestamp: false },
   colors: { pink: 0xff5c8a, red: 0xe63946, gold: 0xffc857, purple: 0xb085f5, grey: 0x6c757d, orange: 0xffb347, green: 0x57d68d, success: 0x57d68d, error: 0xe63946, warning: 0xffb347, info: 0x8ab4f8, neutral: 0xff5c8a },
   ui: { style: 'embed', plainCommands: {}, autoEmbed: true, mergeContent: true, statusEmoji: true, safeLimits: true, errorTitle: 'Oops', successTitle: '', warningTitle: 'Heads up', infoTitle: '' },
   prefix: { default: 'yuna', allowMention: true, aliases: {}, hintOnBarePrefix: true },

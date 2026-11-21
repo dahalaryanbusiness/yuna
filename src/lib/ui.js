@@ -25,19 +25,18 @@ const LEAD = [
 ];
 const kindOf = (text) => { for (const [re, k] of LEAD) if (re.test(text.trim())) return k; return 'neutral'; };
 
-function applyBrand(em, { footer = true } = {}) {
+function applyBrand(em) {
   const d = em.data || em;
-  if (footer && config.brand.showFooter && config.brand.footer && !d.footer) em.setFooter({ text: config.brand.footer });
   if (config.brand.showTimestamp && !d.timestamp) em.setTimestamp();
   return em;
 }
 
-function notice(kind, text, { title, footer = false } = {}) {
+function notice(kind, text, { title } = {}) {
   const k = KINDS[kind] || KINDS.neutral;
   const em = new EmbedBuilder().setColor(k.color()).setDescription(String(text).slice(0, 4000));
   const t = title !== undefined ? title : k.titleKey ? config.ui[k.titleKey] : '';
   if (t) em.setTitle(t);
-  return footer ? applyBrand(em) : em;
+  return em;
 }
 
 function fromPlain(text) {
@@ -57,8 +56,7 @@ function clamp(em) {
     d.fields = d.fields.slice(0, 25);
     for (const f of d.fields) { f.name = cut(String(f.name || '\u200b'), 256); f.value = cut(String(f.value || '\u200b'), 1024); }
   }
-  if (d.footer && d.footer.text) d.footer.text = cut(d.footer.text, 2048);
-  const size = () => (d.title || '').length + (d.description || '').length + (d.footer ? d.footer.text.length : 0) + (d.fields || []).reduce((n, f) => n + f.name.length + f.value.length, 0) + (d.author ? (d.author.name || '').length : 0);
+  const size = () => (d.title || '').length + (d.description || '').length + (d.fields || []).reduce((n, f) => n + f.name.length + f.value.length, 0) + (d.author ? (d.author.name || '').length : 0);
   let over = size() - 5900;
   if (over > 0 && d.description) { d.description = cut(d.description, Math.max(200, d.description.length - over)); over = size() - 5900; }
   while (over > 0 && d.fields && d.fields.length) { d.fields.pop(); over = size() - 5900; }
@@ -88,7 +86,10 @@ async function paginate(interaction, pages, opts = {}) {
     if (total > 1 || opts.close !== false) {
       const b = (act, label, emoji, style = ButtonStyle.Secondary, off = false) => new ButtonBuilder().setCustomId(`x:${id}:${act}`).setLabel(label).setEmoji(emoji).setStyle(style).setDisabled(off);
       const nav = [];
-      if (total > 1) nav.push(b('first', 'First', '\u23EE\uFE0F', ButtonStyle.Secondary, idx === 0), b('prev', 'Back', '\u25C0\uFE0F', ButtonStyle.Primary, idx === 0), b('next', 'Next', '\u25B6\uFE0F', ButtonStyle.Primary, idx === total - 1), b('last', 'Last', '\u23ED\uFE0F', ButtonStyle.Secondary, idx === total - 1));
+      if (total > 1) {
+        const counter = new ButtonBuilder().setCustomId(`x:${id}:count`).setLabel(`${idx + 1}/${total}`).setStyle(ButtonStyle.Secondary).setDisabled(true);
+        nav.push(b('prev', 'Back', '\u25C0\uFE0F', ButtonStyle.Primary, idx === 0), counter, b('next', 'Next', '\u25B6\uFE0F', ButtonStyle.Primary, idx === total - 1));
+      }
       if (opts.close !== false) nav.push(b('close', 'Close', '\u2716\uFE0F', ButtonStyle.Danger));
       rows.push(new ActionRowBuilder().addComponents(nav));
     }
@@ -100,10 +101,7 @@ async function paginate(interaction, pages, opts = {}) {
     return rows.slice(0, 5);
   };
   const frame = () => {
-    const em = clamp(get(idx));
-    const d = em.data;
-    if (total > 1 && !(d.footer && /Page \d+\/\d+/.test(d.footer.text || ''))) em.setFooter({ text: `Page ${idx + 1}/${total}${d.footer && d.footer.text ? `  \u2022  ${d.footer.text}` : config.brand.footer ? `  \u2022  ${config.brand.footer}` : ''}` });
-    return { embeds: [em], components: render() };
+    return { embeds: [clamp(get(idx))], components: render() };
   };
 
   if (sessions.size >= config.performance.maxButtonSessions) sessions.delete(sessions.keys().next().value);
@@ -113,10 +111,8 @@ async function paginate(interaction, pages, opts = {}) {
       if (i.user.id !== owner) return i.reply({ embeds: [notice('warning', 'This menu belongs to someone else. Open your own with the same command.')], flags: 64 });
       if (action === 'close') { end(); return i.update({ components: [] }); }
       if (action === 'go') idx = Number(i.values && i.values[0]) || 0;
-      else if (action === 'first') idx = 0;
       else if (action === 'prev') idx = Math.max(0, idx - 1);
       else if (action === 'next') idx = Math.min(total - 1, idx + 1);
-      else if (action === 'last') idx = total - 1;
       s.timer.refresh();
       return i.update(frame());
     },

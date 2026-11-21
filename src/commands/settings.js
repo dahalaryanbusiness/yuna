@@ -1,6 +1,5 @@
 // /settings: per-server look of Yuna's embeds. Needs Manage Server.
 //   color  : accent color for Yuna's standard (pink) embeds. Status colors (green/red/orange) are never changed.
-//   footer : text under embeds, or "off"
 //   view   : shows what is set
 //   reset  : back to the defaults from config/yuna.config.js
 const { PermissionFlagsBits } = require('discord.js');
@@ -15,7 +14,6 @@ const settings = {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addSubcommand((s) => s.setName('view').setDescription('See this server\'s look settings'))
     .addSubcommand((s) => s.setName('color').setDescription('Set the accent color of Yuna\'s embeds').addStringOption((o) => o.setName('hex').setDescription('A hex color like #ff5c8a').setRequired(true)))
-    .addSubcommand((s) => s.setName('footer').setDescription('Set the footer text under embeds, or "off" to hide it').addStringOption((o) => o.setName('text').setDescription('Footer text (max 100 characters) or off').setRequired(true)))
     .addSubcommand((s) => s.setName('reset').setDescription('Go back to the default look')),
 
   async execute(interaction) {
@@ -32,12 +30,6 @@ const settings = {
       store.save();
       return interaction.reply({ embeds: [embed(g.ui.color).setTitle('Accent color saved').setDescription(`Yuna's standard embeds in this server now use **#${m[1].toLowerCase()}**.`)] });
     }
-    if (sub === 'footer') {
-      const raw = String(interaction.options.getString('text') || '').trim().slice(0, 100);
-      g.ui = { ...(g.ui || {}), footer: /^(off|none|hide)$/i.test(raw) ? false : raw };
-      store.save();
-      return interaction.reply({ embeds: [notice('success', g.ui.footer === false ? 'Footers are now hidden in this server.' : `Footer set to: **${raw}**`)] });
-    }
     if (sub === 'reset') {
       delete g.ui;
       store.save();
@@ -46,8 +38,7 @@ const settings = {
     const ui = g.ui || {};
     return interaction.reply({
       embeds: [embed(ui.color ?? config.colors.neutral).setTitle('Server look').addFields(
-        { name: 'Accent color', value: ui.color !== undefined ? `#${ui.color.toString(16).padStart(6, '0')}` : 'default', inline: true },
-        { name: 'Footer', value: ui.footer === false ? 'hidden' : ui.footer || (config.brand.showFooter ? config.brand.footer : 'hidden'), inline: true }
+        { name: 'Accent color', value: ui.color !== undefined ? `#${ui.color.toString(16).padStart(6, '0')}` : 'default', inline: true }
       )],
     });
   },

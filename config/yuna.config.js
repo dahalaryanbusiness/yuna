@@ -7,8 +7,6 @@ module.exports = {
   // ---------------------------------------------------------------- brand
   brand: {
     name: 'Yuna',
-    footer: 'Yuna  \u2022  /help',   // small text under embeds. Use '' to hide it.
-    showFooter: true,                // false = never add a footer (commands that set their own footer keep it)
     showTimestamp: false,            // true = every embed shows the time it was sent
   },
 

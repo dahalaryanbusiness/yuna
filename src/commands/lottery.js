@@ -38,9 +38,7 @@ function panel(user, l, added) {
       { name: 'Winning Chance', value: code(pct(chanceOf(l, user.id))), inline: true },
       { name: 'Current Jackpot', value: code(`${num(jackpot(l))} LP`), inline: true },
       { name: 'Ends in', value: code(ago(l.endsAt - Date.now())), inline: true }
-    )
-    .setFooter({ text: 'Percentage and jackpot may change over time' })
-    .setTimestamp();
+    );
 }
 
 const lottery = {

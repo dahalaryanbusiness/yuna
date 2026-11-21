@@ -145,7 +145,7 @@ const PAGES = [
     title: 'Server settings (admins)',
     blurb: 'Need **Manage Server** (or **Manage Channels** for the channel switches).',
     fields: (p) => [
-      { name: '🎨 /settings', value: 'Set the server\'s accent color (`/settings color`), the footer text (`/settings footer`), see everything with `/settings view` and undo with `/settings reset`.' },
+      { name: '🎨 /settings', value: 'Set the server\'s accent color (`/settings color`), see everything with `/settings view` and undo with `/settings reset`.' },
       { name: '🔤 Prefix', value: `\`${p} prefix <new>\` sets it, \`${p} prefix\` shows it, \`${p} prefix reset\` goes back to the default.` },
       { name: '🚫 Channel switches', value: `\`${p} disablecommands\` turns ALL commands off in the current channel, \`${p} disablecommands casino give\` only those. \`${p} enablecommands\` turns them back on.` },
       { name: '🤖 Trusted bots', value: '`/trustedbots add @bot` lets a bot (like Ommne) run text commands such as `yuna hug @user`. Money, shop, crime, casino, admin and privacy commands stay blocked for bots.' },
@@ -189,7 +189,7 @@ const DETAILS = {
   job: { examples: ['/job list', '{p} apply', '{p} study'], notes: 'Better jobs need higher education and rank.' },
   help: { examples: ['/help', '/help topic:bank', '{p} help business'], notes: 'Use the menu or the buttons to move between pages.' },
   prefix: { examples: ['{p} prefix y', '{p} prefix reset'], notes: 'Needs Manage Server to change.' },
-  settings: { examples: ['/settings color #ff5c8a', '/settings footer Welcome!', '/settings reset'], notes: 'Needs Manage Server.' },
+  settings: { examples: ['/settings color #ff5c8a', '/settings view', '/settings reset'], notes: 'Needs Manage Server.' },
 };
 
 module.exports = { PAGES, DETAILS };

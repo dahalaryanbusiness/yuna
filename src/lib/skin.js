@@ -74,7 +74,6 @@ function embedToText(em) {
     const parts = d.fields.map((f) => `**${String(f.name).replace(/\*\*/g, '')}** ${f.value}`);
     out.push(parts.join('').length < 140 && !parts.some((x) => x.includes('\n')) ? parts.join('  \u2022  ') : parts.join('\n'));
   }
-  if (d.footer && d.footer.text) out.push(`-# ${d.footer.text}`);
   return out.join('\n');
 }
 
@@ -132,12 +131,9 @@ function payload(p, ctx, edit = false) {
   if (Array.isArray(out.embeds)) {
     out.embeds = out.embeds.map((em) => {
       const d = em && em.data ? em.data : em;
-      if (em && em.setFooter && d && !d.color && d.color !== 0) em.setColor(config.colors.neutral);
+      if (em && em.setColor && d && !d.color && d.color !== 0) em.setColor(config.colors.neutral);
       if (look && look.color !== undefined && d && (d.color === config.colors.pink || d.color === config.colors.neutral)) em.setColor(look.color); // server accent, status colors untouched
-      if (em && em.setFooter) {
-        if (look && look.footer === false) { /* footer hidden by this server */ } else if (look && typeof look.footer === 'string' && look.footer && !d.footer) em.setFooter({ text: look.footer });
-        else ui.applyBrand(em);
-      }
+      if (em && em.setTimestamp) ui.applyBrand(em);
       return ui.clamp(em);
     }).slice(0, 10);
   }

@@ -28,9 +28,7 @@ async function run(interaction, { type, verb, emoji, color, selfMsg, botMsg }) {
 
   const embed = new EmbedBuilder()
     .setColor(color)
-    .setDescription(`${emoji} **${interaction.user.displayName}** ${verb} **${target.displayName}**!`)
-    .setFooter({ text: 'dragoodemon_' })
-    .setTimestamp();
+    .setDescription(`${emoji} **${interaction.user.displayName}** ${verb} **${target.displayName}**!`);
   if (gif) embed.setImage(gif);
 
   return interaction.editReply({ content: `${target}`, embeds: [embed] });

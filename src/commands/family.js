@@ -120,8 +120,7 @@ const adopt = {
         { name: `${emo('famtree_pink')} ${name(actor)}'s family`, value: `**${me.children.length}**/${MAX_CHILDREN} children\nBond level **${bondLevel(famStats(actor.id).xp)}**`, inline: true },
         { name: `${emo('fam_home')} ${name(target)}'s parents`, value: `**${them.parents.length}**/${MAX_PARENTS}\n${parentNow}`, inline: true },
         { name: '⏳ Expires', value: `<t:${expires}:R>`, inline: true }
-      )
-      .setFooter({ text: `Only ${name(target)} can answer this request` });
+      );
     return ask(interaction, {
       to: target.id,
       content: `${target}`,
@@ -266,8 +265,7 @@ const family = {
     const e = embed(COLORS.orange)
       .setTitle(`${emo('famtree_green')} ${who.displayName}'s family`)
       .setThumbnail(who.displayAvatarURL({ size: 128 }))
-      .setDescription(`${emo('a_heart_hotpink')} ${summary} ${emo('a_twinkle_gold')}\n\n${ancLines.length ? `${ancLines.join('\n')}\n\n` : `${emo('arrow_up_hotpink')} **Parents:** *none*\n\n`}${treeBlock}`.slice(0, 4000))
-      .setFooter({ text: '/family adopt  \u2022  /family dinner  \u2022  /family chore  \u2022  /family bond' });
+      .setDescription(`${emo('a_heart_hotpink')} ${summary} ${emo('a_twinkle_gold')}\n\n${ancLines.length ? `${ancLines.join('\n')}\n\n` : `${emo('arrow_up_hotpink')} **Parents:** *none*\n\n`}${treeBlock}`.slice(0, 4000));
     if (fields.length) e.addFields(fields.slice(0, 24));
     return interaction.reply({ embeds: [e], allowedMentions: { parse: [] } });
   },
@@ -302,9 +300,9 @@ const dinner = {
         `${members.slice(0, 12).map(mention).join(' ')}${members.length > 12 ? ' and more' : ''}\n\n` +
         `${emo('coin')} Host: **+${num(hostGot)}** LP${full ? ` (+${B.family.fullHouse} full-house bonus)` : ''}\n` +
         `${emo('gift_bounce')} Every guest: **+${num(base)}** LP\n` +
-        `${emo('a_twinkle_gold')} Bond XP **+12** for everyone (bond level **${lvl}**)`
-      )
-      .setFooter({ text: `Dinners hosted: ${fs.dinners}  \u2022  next one in 6 hours` });
+        `${emo('a_twinkle_gold')} Bond XP **+12** for everyone (bond level **${lvl}**)\n` +
+        `Dinners hosted: **${fs.dinners}**, the next one is possible in 6 hours`
+      );
     return interaction.reply({ embeds: [e], allowedMentions: { parse: [] } });
   },
 };

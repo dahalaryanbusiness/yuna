@@ -116,7 +116,7 @@ function topicEmbed(client, rawTopic, p) {
     em.addFields({ name: 'Examples', value: extra.examples.map((x) => `\`${x.replace(/\{p\}/g, p)}\``).join('\n') });
     if (extra.notes) em.addFields({ name: 'Good to know', value: extra.notes });
   }
-  if (cmd.prefixOnly) em.setFooter({ text: 'This one is a text command only (no slash version).' });
+  if (cmd.prefixOnly) em.addFields({ name: 'Text only', value: 'This one has no slash version, use it with the text prefix.' });
   return em;
 }
 

@@ -17,7 +17,6 @@ const line = (slot) => {
 function view(user) {
   const q = Q.state(user.id);
   const ready = Q.unclaimed(user.id);
-  const doneToday = q.daily.filter((s) => s.claimed).length;
   const emb = embed(COLORS.gold)
     .setAuthor({ name: `${user.displayName || user.username}'s quests`, iconURL: user.displayAvatarURL({ size: 64 }) })
     .setTitle(`${e('trophy_shine')} Yuna quests`)
@@ -26,8 +25,7 @@ function view(user) {
       `**Weekly quests** \u2022 resets <t:${Q.nextWeekTs()}:R>\n${q.weekly.map(line).join('\n')}\n\n` +
       `${e('fire')} Streak: **${q.streak}** day${q.streak === 1 ? '' : 's'} \u2022 Quests done: **${q.total}**\n` +
       `-# Finish and claim all 3 daily quests for a sweep bonus. Every 5th streak day adds a Treasure Chest.`
-    )
-    .setFooter({ text: doneToday === 3 ? 'All daily quests claimed, see you tomorrow!' : 'Just use Yuna normally and the bars fill up' });
+    );
   return { emb, ready };
 }
 
