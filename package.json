@@ -9,7 +9,8 @@
     "test": "node tools/smoke.js",
     "test:all": "node tools/smoke.js --all",
     "emojis": "python3 tools/make_mega_emojis.py",
-    "emojis:unique": "python3 tools/make_unique_emojis.py"
+    "emojis:unique": "python3 tools/make_unique_emojis.py",
+    "test:owner": "node tools/owner-economy.test.js"
   },
   "engines": {
     "node": ">=18"

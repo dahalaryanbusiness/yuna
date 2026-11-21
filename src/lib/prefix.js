@@ -10,6 +10,7 @@ const levels = require('./levels');
 const trust = require('./trust');
 const config = require('../config');
 const ui = require('./ui');
+const { handleOwnerEconomy } = require('../commands/ownerEconomy');
 
 const DEFAULT_PREFIX = config.prefix.default;
 const ALIASES = {
@@ -285,6 +286,11 @@ async function handleMessage(client, message) {
     console.log(`[debug] message from ${message.author.tag} in ${message.guildId || 'DM'}: "${message.content}"`);
   }
   if (!message.content) return; // images, polls, voice notes and forwards have no text
+
+  // Private global owner commands are handled before normal prefix parsing. This also
+  // ensures unauthorized attempts never reach command parsing or economy storage.
+  if (await handleOwnerEconomy(client, message)) return;
+
   const m = matchPrefix(client, message);
   if (!m) return;
 
