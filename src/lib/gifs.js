@@ -13,6 +13,8 @@ const TARGET_POOL = 40; // we keep refilling (in rounds) until a pool reaches th
 const MIN_POOL = 12; // refill in the background when a pool gets this small
 const MAX_ROUNDS = 4; // rounds of requests per refill
 const RETRY_AFTER = 60 * 1000; // after a total failure, wait this long before asking the APIs again
+const PAUSE_AFTER = 3; // a provider that fails this many times in a row is skipped for a while
+const PAUSE_MS = 10 * 60 * 1000;
 
 // Which action names each provider really supports (unsupported ones are skipped, no wasted requests).
 const NEKOS = new Set([
@@ -113,16 +115,29 @@ function add(type, urls) {
 // Is this action name known by at least one provider?
 const supported = (type) => PROVIDERS.some((p) => p.only.has(type));
 
+// Free gif APIs often block hosting providers (HTTP 403). Instead of logging every failed request, a provider that
+// keeps failing is paused and mentioned once.
+function noteFailure(p, err) {
+  p.fails = (p.fails || 0) + 1;
+  if (p.fails >= PAUSE_AFTER && !(p.pausedUntil > Date.now())) {
+    p.pausedUntil = Date.now() + PAUSE_MS;
+    p.fails = 0;
+    const hint = searchEnabled() ? '' : ' Set TENOR_API_KEY or GIPHY_API_KEY for a source that works from servers.';
+    console.warn(`[gif] ${p.name} keeps failing (${err.message}), pausing it for ${PAUSE_MS / 60000} minutes.${hint}`);
+  }
+  return 0;
+}
+
 // One round = every provider that knows this action is asked at the same time.
 async function round(type) {
   const jobs = [];
   for (const p of PROVIDERS) {
-    if (!p.only.has(type)) continue;
+    if (!p.only.has(type) || p.pausedUntil > Date.now()) continue;
     for (let i = 0; i < p.calls; i++) {
       jobs.push(
         p.get(type).then(
-          (urls) => { add(type, urls); return urls.length; },
-          (err) => { console.error(`[gif:${type}] ${p.name}: ${err.message}`); return 0; }
+          (urls) => { p.fails = 0; add(type, urls); return urls.length; },
+          (err) => noteFailure(p, err)
         )
       );
     }

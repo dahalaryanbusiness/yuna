@@ -272,8 +272,6 @@ function makeInteraction(client, message, name, parsed) {
   return i;
 }
 
-let warnedEmpty = false;
-
 async function handleMessage(client, message) {
   if (message.system) return;
   // Bots are ignored, except bots on the trusted list (see lib/trust.js). Yuna never answers herself or webhooks.
@@ -286,17 +284,7 @@ async function handleMessage(client, message) {
   if (process.env.DEBUG_PREFIX) {
     console.log(`[debug] message from ${message.author.tag} in ${message.guildId || 'DM'}: "${message.content}"`);
   }
-  if (!message.content) {
-    // Without the Message Content intent Discord sends human messages with empty text.
-    if (!warnedEmpty && !message.attachments.size && !message.stickers.size && !message.embeds.length) {
-      warnedEmpty = true;
-      console.warn(
-        '[prefix] Received a message with EMPTY text. The Message Content Intent is not active, so "yuna ..." cannot be read.\n' +
-          'Enable it: Developer Portal > your app > Bot > Privileged Gateway Intents > Message Content Intent > Save, then restart the bot.'
-      );
-    }
-    return;
-  }
+  if (!message.content) return; // images, polls, voice notes and forwards have no text
   const m = matchPrefix(client, message);
   if (!m) return;
 
@@ -305,7 +293,7 @@ async function handleMessage(client, message) {
     if (fromBot || channels.allOff(message.guildId, message.channelId)) return;
     if (m.prefix.toLowerCase() === DEFAULT_PREFIX || m.prefix.startsWith('<@')) {
       const shown = getPrefix(message.guildId);
-      if (config.prefix.hintOnBarePrefix) await message.reply({ embeds: [ui.applyBrand(ui.notice('info', `My prefix here is \`${shown}\`.\nTry \`${shown} help\` to see everything I can do.`, { title: `Hi, I'm ${config.brand.name}` }))], allowedMentions: { repliedUser: false } }).catch(() => {});
+      if (config.prefix.hintOnBarePrefix) await message.reply({ embeds: [ui.notice('info', `My prefix here is \`${shown}\`.\nTry \`${shown} help\` to see everything I can do.`, { title: `Hi, I'm ${config.brand.name}` })], allowedMentions: { repliedUser: false } }).catch(() => {});
     }
     return;
   }
